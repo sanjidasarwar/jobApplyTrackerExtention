@@ -11,7 +11,7 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
         
         chrome.storage.local.get(["jobs"], (data) => {
             const jobs = data.jobs || [];
-            console.log(jobs)
+
             const newJob ={
                 ...response,
                 status: "Saved",
@@ -51,9 +51,29 @@ function loadJobs() {
                 <a href="${job.url}" target="_blank">View Job</a>
                 <p>Status: ${job.status}</p>
                 <p>Applied on: ${new Date(job.date).toLocaleDateString()}</p>
+                <button class="delete-btn" data-url="${job.url}" >Remove</button>
             `
             jobContainer.appendChild(jobDiv);
         })
 
+        jobContainer.addEventListener('click', (e)=>{
+            if(e.target.classList.contains('delete-btn')){
+                const jobUrl = e.target.getAttribute('data-url')
+                deleteSingleJob(jobUrl)
+            }
+        })
+    })
+}
+
+function deleteSingleJob (jobUrl){   
+    const confirmDelete = confirm("Are you sure you want to delete this job?");
+    if (!confirmDelete) return;
+
+    chrome.storage.local.get(['jobs'], data =>{
+        const jobs = data.jobs || []
+        const newJobs = jobs.filter(job => job.url !== jobUrl) 
+        chrome.storage.local.set({jobs: newJobs}, ()=> {
+            loadJobs()
+        })
     })
 }
