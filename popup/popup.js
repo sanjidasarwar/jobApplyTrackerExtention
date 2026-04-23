@@ -77,3 +77,21 @@ function deleteSingleJob (jobUrl){
         })
     })
 }
+
+const deleteAllBtn = document.getElementById('deleteAll')
+deleteAllBtn.addEventListener('click', ()=>{
+     if (!data.jobs || data.jobs.length === 0) {
+        alert("No jobs to delete");
+        return;
+    }
+    const confirmDelete = confirm("Are you sure you want to delete all jobs?");
+    if (!confirmDelete) return;
+    chrome.storage.local.get(['jobs'], data =>{
+            const jobs = data.jobs || []
+            chrome.storage.local.remove("jobs", ()=>{
+                loadJobs()
+            })
+                
+
+        })
+})
